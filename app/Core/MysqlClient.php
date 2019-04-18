@@ -51,16 +51,16 @@ class MysqlClient
     }
 
     /**
-     * Исполнение запроса
+     * Достаем данные
      *
      * @param string $sql
      *
      * @return mixed
      */
-    private function executeSQL($sql)
+    private function getQueryResult($sql)
     {
         $this->createDBconnection();
-        $data =  $this->db->query($sql);
+        $data = $this->db->query($sql);
         $this->dropDBconnection();
         return $data;
     }
@@ -89,7 +89,12 @@ class MysqlClient
      */
     public function getValue($sql)
     {
-        return $this->executeSQL($sql)->fetch()[0];
+        $query = $this->getQueryResult($sql);
+        if($query)
+        {
+            return $query->fetch()[0];
+        }
+        return false;
     }
 
     /**
@@ -98,15 +103,21 @@ class MysqlClient
      * @param string $sql
      * @param bool $oneRow
      *
-     * @return array
+     * @return array|bool
      */
     public function getValues($sql, $oneRow = false)
     {
-        if($oneRow)
+        $query = $this->getQueryResult($sql);
+        if($query)
         {
-            return $this->executeSQL($sql)->fetch();
+            if($oneRow)
+            {
+                return $query->fetch();
+            }
+
+            return $query->fetchAll();
         }
 
-        return $this->executeSQL($sql)->fetchAll();
+        return false;
     }
 }

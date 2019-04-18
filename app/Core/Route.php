@@ -31,9 +31,11 @@ class Route
         if(file_exists(__DIR__.'/../Controller/' . ucwords($this->path_arr[1]) . 'Controller.php'))
         {
             return method_exists('App\\Controller\\' . ucwords($this->path_arr[1]) . 'Controller', count($this->path_arr) > 2 ? $this->path_arr[2] : 'index');
+        } elseif(method_exists('App\\Controller\\MainController', $this->path_arr[1])) {
+            $this->path_arr[2] = $this->path_arr[1];
+            $this->path_arr[1] = 'main';
+            return true;
         }
-
-        return false;
     }
 
     /**

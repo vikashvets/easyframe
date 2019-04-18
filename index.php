@@ -3,6 +3,10 @@ namespace Course;
 
 use App\Core\Core;
 
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
 $loader = require 'vendor/autoload.php';
 $loader->add('App', __DIR__.'/app/');
 

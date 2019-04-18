@@ -41,6 +41,17 @@ class Core
         return false;
     }
 
+    static public function insert($str, $vars)
+    {
+        $str = __DIR__ . '/../templates/' . $str . '.phtml';
+        if(file_exists($str))
+        {
+            $core = new Core();
+            $data = $vars;
+            require $str;
+        }
+    }
+
     /**
      * Вывод файла
      *
@@ -49,7 +60,7 @@ class Core
     static public function compileFile($route_data)
     {
         echo '<html lang="ru-RU">';
-        $Core = new Core();
+        $core = new Core();
         $data = $route_data['data'];
         require $route_data['header'];
         require $route_data['template'];
@@ -65,5 +76,51 @@ class Core
     static public function getMysql()
     {
         return new MysqlClient();
+    }
+
+    /**
+     * @param $array
+     * @return array
+     */
+    static function prepareArrayToInsert($array)
+    {
+        $result = [];
+        foreach ($array as $key => $value)
+        {
+            if($value)
+            {
+                $result['column'][] = '`' . $key . '`';
+                $result['value'][] = is_string($value) ? "'" . addslashes($value) . "'" : $value;
+            }
+            else
+            {
+                $result['column'][] = '`' . $key . '`';
+                $result['value'][] = '0';
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string $date
+     * @return false|string
+     */
+    static function convertDate($date)
+    {
+       return date('Y-m-d H:i', (is_string($date) ? strtotime($date) : $date));
+    }
+
+
+    static public function print_val($val)
+    {
+        echo '<pre>';
+        print_r($val);
+        echo '</pre>';
+    }
+
+    static public function getAsset($asset)
+    {
+        return ($_SERVER['SERVER_PROTOCOL'] === 'HTTP/1.1' ? 'http' : 'https') . '://' . $_SERVER['HTTP_HOST'] . '/app/assets/' . $asset;
     }
 }
